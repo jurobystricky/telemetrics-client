@@ -1,7 +1,7 @@
 /*
  * This program is part of the Clear Linux Project
  *
- * Copyright 2015 Intel Corporation
+ * Copyright 2019 Intel Corporation
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms and conditions of the GNU Lesser General Public License, as
@@ -28,6 +28,7 @@
 #include <time.h>
 #include <malloc.h>
 #include <sys/uio.h>
+#include <pwd.h>
 
 #include "iorecord.h"
 #include "telemdaemon.h"
@@ -292,9 +293,21 @@ static void stage_record(char *filepath, char *headers[], char *body, char *cfg_
                 fprintf(tmpfile, "%s\n", headers[i]);
         }
 
-        //write body
+        // write body
         fprintf(tmpfile, "%s\n", body);
         fflush(tmpfile);
+
+
+        struct passwd *pw = getpwnam("telemetry");
+        if (pw) {
+                if (fchown(tmpfd, pw->pw_uid, pw->pw_gid) == -1) {
+                        fprintf(stderr, "JB: error changing file owner\n");
+                        telem_perror("Error: chown failed");
+                }
+        } else {
+                telem_log(LOG_ERR, "user \"telemetry\" does not exist.\n");
+        }
+
         fclose(tmpfile);
 
 clean_exit:
@@ -302,10 +315,126 @@ clean_exit:
         return;
 }
 
+/*
+
+Apr 22 16:20:15 clear-nuc telemprobd[14132]: DEBUG [info_users] (1000)     juro          :0 (:0)
+Apr 22 16:20:15 clear-nuc telemprobd[14132]: DEBUG [info_users] (1002)    juro1       pts/0 (10.54.74.159)
+Apr 22 16:20:15 clear-nuc telemprobd[14132]: DEBUG [info_users] (1000)     juro       pts/1 (10.54.74.159)
+Apr 22 16:20:15 clear-nuc telemprobd[14132]: DEBUG [info_users] (1000)     juro       pts/2 (10.54.74.159)
+Apr 22 16:20:15 clear-nuc telemprobd[14132]: DEBUG [info_users] (1000)     juro       pts/5 (10.54.74.159)
+
+ */
+#include<sys/utsname.h>
+#include<utmp.h>
+#include <pwd.h>
+
+static void info_users(void)
+{
+        struct utmp *n;
+        setutent();
+        n = getutent();
+
+        while (n) {
+                if (n->ut_type == USER_PROCESS) {
+                        struct passwd *p;
+
+                        if ((p = getpwnam(n->ut_user)) == NULL) {
+                                perror(n->ut_user);
+                                // return EXIT_FAILURE;
+                        }
+
+                        fprintf(stderr, "DEBUG [%s] (%d)%9s%12s (%s)\n", __func__,
+                               (int) p->pw_uid, n->ut_user, n->ut_line, n->ut_host);
+                }
+
+        n = getutent();
+        }
+}
+
+#define CONSENTGUI_APP "/home/juro/telemgui"
+static int get_user_consent(char *headers[], char *body)
+{
+        struct utmp *n;
+
+        if (access(CONSENTGUI_APP, (F_OK | X_OK)) == -1) {
+                fprintf(stderr, "DEBUG [%s] not found: %s, consent granted\n",
+                        __func__, CONSENTGUI_APP);
+                return 0;
+        }
+
+        info_users();
+
+        fflush(stdout);
+        setutent();
+        n = getutent();
+
+        setenv("LANG", "C", 1);
+        //setenv("G_MESSAGES_DEBUG", "all", 1);
+        //setenv("GTK_DEBUG", "all", 1);
+
+        while (n) {
+                char string_tmp[256];
+                FILE *fp;
+
+                if (n->ut_type == USER_PROCESS) {
+                        struct passwd *p;
+
+                        if ((p = getpwnam(n->ut_user)) == NULL) {
+                                perror(n->ut_user);
+                                // return EXIT_FAILURE;
+                                continue;
+                        }
+
+                        fprintf(stderr, "DEBUG [%s] (%d)%9s%12s (%s)\n", __func__,
+                               (int) p->pw_uid, n->ut_user, n->ut_line, n->ut_host);
+
+                        // Only consider user owning DISPLAY=:0
+                        if (n->ut_line[0] == ':' && n->ut_line[1] == '0') {
+                                setenv("DISPLAY", n->ut_line, 1);
+
+                                snprintf(string_tmp, sizeof(string_tmp),
+                                         "/run/user/%d",(int) p->pw_uid);
+                                setenv("XDG_RUNTIME_DIR", string_tmp, 1);
+
+                                snprintf(string_tmp, sizeof(string_tmp),
+                                         "/run/user/%d/gdm/Xauthority",(int) p->pw_uid);
+                                setenv("XAUTHORITY", string_tmp, 1);
+
+                                // Commad line: pass username as argv[1],
+                                // pass headers + payload via stdin
+                                snprintf(string_tmp, sizeof(string_tmp),
+                                         "%s %s", CONSENTGUI_APP, n->ut_user);
+
+                                fp = popen(string_tmp, "w");
+                                if (fp != NULL) {
+                                        // write headers
+                                        fprintf(fp,"Headers:\n\n");
+                                        for (int i = 0; i < NUM_HEADERS; i++) {
+                                                fprintf(fp, "%s\n", headers[i]);
+                                        }
+                                        // write body
+                                        fprintf(fp,"\nRecord Payload:\n\n");
+                                        fprintf(fp, "%s\n", body);
+                                        fflush(fp);
+                                        //TODO : check the return value poperly
+                                        return pclose(fp);
+                                }
+                        } else {
+                                fprintf(stderr, "DEBUG [%s] skipped...[%s]\n", __func__, n->ut_line);
+                        }
+                }
+
+                n = getutent();
+        }
+
+        // Return success (consent granted) if no suitable desktop users
+        return 0;
+}
+
 void process_record(TelemDaemon *daemon, client *cl)
 {
         int i = 0;
-        int ret = 0;
+        int consent, ret = 0;
         char *headers[NUM_HEADERS];
         char *tok = NULL;
         size_t header_size = 0;
@@ -360,15 +489,24 @@ void process_record(TelemDaemon *daemon, client *cl)
         /* TODO : check if the body is within the limits. */
         body = msg + header_size;
 
-        /* Save record to stage */
-        ret = asprintf(&recordpath, "%s/XXXXXX", spool_dir_config());
-        if (ret == -1) {
-                telem_log(LOG_ERR, "Failed to allocate memory for record name in staging folder, aborting\n");
-                exit(EXIT_FAILURE);
+        consent = get_user_consent(headers, body);
+        fprintf (stderr, "***JB consent=%d\n", consent);
+
+        if (consent == 0) {
+                fprintf (stderr, "DEBUG: [%s] consent granted\n", __func__);
+                /* Save record to stage */
+                ret = asprintf(&recordpath, "%s/XXXXXX", spool_dir_config());
+                if (ret == -1) {
+                        telem_log(LOG_ERR, "Failed to allocate memory for record name in staging folder, aborting\n");
+                        exit(EXIT_FAILURE);
+                }
+
+                stage_record(recordpath, headers, body, cfg_file);
+                free(recordpath);
+        } else {
+                fprintf(stderr, "DEBUG: [%s] consent denied!\n", __func__);
         }
 
-        stage_record(recordpath, headers, body, cfg_file);
-        free(recordpath);
 end:
         free(temp_headers);
         for (int k = 0; k < i; k++)
