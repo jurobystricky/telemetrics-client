@@ -29,6 +29,7 @@ AM_CPPFLAGS = \
 	-DLOCALSTATEDIR=\"$(localstatedir)\" \
 	-DPSTOREDIR=\"$(localstatedir)/cache/telemetry/pstore\" \
 	-DTESTOOPSDIR=\"$(top_srcdir)/tests/oops_test_files\" \
-	-DBACKEND_ADDR=\"$(BACKEND_ADDR)\"
+	-DBACKEND_ADDR=\"$(BACKEND_ADDR)\" \
+	-DLOCALEDIR=\"$(localedir)\"
 
 # vim: filetype=automake tabstop=8 shiftwidth=8 noexpandtab

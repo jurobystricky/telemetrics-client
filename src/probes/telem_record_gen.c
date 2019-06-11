@@ -28,9 +28,12 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "gettext.h"
 #include "log.h"
 #include "common.h"
 #include "telemetry.h"
+
+#define _(String) gettext (String)
 
 static uint32_t severity = 1;
 static char *opt_class = NULL;
@@ -58,23 +61,23 @@ static const struct option prog_opts[] = {
 
 static void print_help(void)
 {
-        printf("Usage:\n");
-        printf("  telem-record-gen [OPTIONS] - create and send a custom telemetry record\n");
+        printf(_("Usage:\n"));
+        printf(_("  telem-record-gen [OPTIONS] - create and send a custom telemetry record\n"));
         printf("\n");
-        printf("Help Options:\n");
-        printf("  -h, --help            Show help options\n");
+        printf(_("Help Options:\n"));
+        printf(_("  -h, --help            Show help options\n"));
         printf("\n");
-        printf("Application Options:\n");
-        printf("  -V, --version         Print the program version\n");
-        printf("  -s, --severity        Severity level (1-4) - (default 1)\n");
-        printf("  -c, --class           Classification level_1/level_2/level_3 (required)\n");
-        printf("  -p, --payload         Record body (max size = 8k) (required)\n");
-        printf("  -P, --payload-file    File to read payload from\n");
-        printf("  -R, --record-version  Version number for format of payload (default 1)\n");
-        printf("  -e, --event-id        Event id to use in the record\n");
-        printf("  -o, --echo            Echo record to stdout\n");
-        printf("  -n, --no-post         Do not post record just print\n");
-        printf("  -f, --config_file     Specify a configuration file other than default\n");
+        printf(_("Application Options:\n"));
+        printf(_("  -V, --version         Print the program version\n"));
+        printf(_("  -s, --severity        Severity level (1-4) - (default 1)\n"));
+        printf(_("  -c, --class           Classification level_1/level_2/level_3 (required)\n"));
+        printf(_("  -p, --payload         Record body (max size = 8k) (required)\n"));
+        printf(_("  -P, --payload-file    File to read payload from\n"));
+        printf(_("  -R, --record-version  Version number for format of payload (default 1)\n"));
+        printf(_("  -e, --event-id        Event id to use in the record\n"));
+        printf(_("  -o, --echo            Echo record to stdout\n"));
+        printf(_("  -n, --no-post         Do not post record just print\n"));
+        printf(_("  -f, --config_file     Specify a configuration file other than default\n"));
         printf("\n");
 }
 
@@ -169,22 +172,22 @@ static bool validate_opts(void)
 
         /* classification */
         if (opt_class == NULL) {
-                fprintf(stderr, "Error: Classification required. See --help.\n");
+                fprintf(stderr, _("Error: Classification required. See --help.\n"));
                 return ret;
         }
 
         len = strlen(opt_class);
 
         if ((len == 0) || (len > MAX_CLASS_LENGTH)) {
-                fprintf(stderr, "Error: Valid size for classification "
-                        "is 1-%d chars\n", MAX_CLASS_LENGTH);
+                fprintf(stderr, _("Error: Valid size for classification "
+                        "is 1-%d chars\n"), MAX_CLASS_LENGTH);
                 return ret;
         }
 
         for (int c = 0; c < len; c++) {
                 if (isascii(opt_class[c]) == 0) {
-                        fprintf(stderr, "Error: Non-ascii characters detected "
-                                "in classification - aborting\n");
+                        fprintf(stderr, _("Error: Non-ascii characters detected "
+                                "in classification - aborting\n"));
                         return ret;
                 }
         }
@@ -195,24 +198,24 @@ static bool validate_opts(void)
                         x = 0;
                 } else {
                         if (x > MAX_SUBCAT_LENGTH) {
-                                fprintf(stderr, "Error: Classification strings"
+                                fprintf(stderr, _("Error: Classification strings"
                                         " between slashes should have at most"
-                                        " %d chars\n", MAX_SUBCAT_LENGTH);
+                                        " %d chars\n"), MAX_SUBCAT_LENGTH);
                                 return ret;
                         }
                 }
         }
 
         if (slashes != 2) {
-                fprintf(stderr, "Error: Classification needs to be in "
-                        "most/to/least specific format, 2 \'/\' required.\n");
+                fprintf(stderr, _("Error: Classification needs to be in "
+                        "most/to/least specific format, 2 \'/\' required.\n"));
                 return ret;
         }
 
 
         /* Severity */
         if ((severity) < 1 || (severity > 4)) {
-                fprintf(stderr, "Error: Valid range for severity is 1-4\n");
+                fprintf(stderr, _("Error: Valid range for severity is 1-4\n"));
                 return ret;
         }
 
@@ -220,11 +223,11 @@ static bool validate_opts(void)
         if (opt_event_id) {
                 size_t result = 0;
                 if ((result = strlen(opt_event_id)) != EVENT_ID_LEN) {
-                        fprintf(stderr, "Error: event_id length %zu it should have %d characters\n", result, EVENT_ID_LEN);
+                        fprintf(stderr, _("Error: event_id length %zu it should have %d characters\n"), result, EVENT_ID_LEN);
                         return ret;
                 }
                 if ((result = strspn(opt_event_id, alphab)) != EVENT_ID_LEN) {
-                        fprintf(stderr, "Error: event_id contains invalid character '%c' at position %zu, valid characters are %s\n",
+                        fprintf(stderr, _("Error: event_id contains invalid character '%c' at position %zu, valid characters are %s\n"),
                                 opt_event_id[result], result, alphab);
                         return ret;
                 }
@@ -242,8 +245,7 @@ static bool get_payload_from_file(char **payload)
         fp = fopen(opt_payload_file, "r");
 
         if (!fp) {
-                fprintf(stderr, "Error: file %s could not be opened "
-                        "for reading\n", opt_payload_file);
+                fprintf(stderr, _("Error: file %s could not be opened for reading\n"), opt_payload_file);
                 goto out;
         }
 
@@ -386,6 +388,10 @@ int main(int argc, char **argv)
 {
         int ret = EXIT_FAILURE;
         char *payload = NULL;
+
+        setlocale(LC_ALL, "");
+        bindtextdomain(PACKAGE, LOCALEDIR);
+        textdomain(PACKAGE);
 
         if (!parse_options(argc, argv)) {
                 goto fail;

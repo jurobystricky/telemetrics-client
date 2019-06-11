@@ -93,7 +93,8 @@ noinst_LTLIBRARIES = %D%/libtelem-shared.la
 	%D%/nica/b64enc.c \
 	%D%/configuration.h \
 	%D%/common.c \
-	%D%/common.h
+	%D%/common.h \
+	%D%/gettext.h
 
 %C%_libtelem_shared_la_CFLAGS = \
 	$(AM_CFLAGS)

@@ -23,10 +23,14 @@
 #include <locale.h>
 #include <sys/sysinfo.h>
 #include <dirent.h>
+#include "config.h"
+#include "gettext.h"
 #include "common.h"
 #include "telemetry.h"
 #include "config.h"
 #include "log.h"
+
+#define _(String) gettext (String)
 
 #define PAYLOAD_LOCALE  0x01
 #define PAYLOAD_UPTIME  0x02
@@ -34,14 +38,14 @@
 
 static void print_usage(char *prog)
 {
-        printf("%s: Usage\n", prog);
-        printf("  -f,  --config_file    Configuration file. This overides the other parameters\n");
-        printf("  -H,  --heartbeat      Create a \"heartbeat\" record instead\n");
-        printf("  -h,  --help           Display this help message\n");
-        printf("  -l,  --locale         Include locale in the record\n");
-        printf("  -u,  --uptime         Include uptime in the record\n");
-        printf("  -b,  --bundles        Include installed bundles in the record\n");
-        printf("  -V,  --version        Print the program version\n");
+        printf(_("%s: Usage\n"), prog);
+        printf(_("  -f,  --config_file    Configuration file. This overides the other parameters\n"));
+        printf(_("  -H,  --heartbeat      Create a \"heartbeat\" record instead\n"));
+        printf(_("  -h,  --help           Display this help message\n"));
+        printf(_("  -l,  --locale         Include locale in the record\n"));
+        printf(_("  -u,  --uptime         Include uptime in the record\n"));
+        printf(_("  -b,  --bundles        Include installed bundles in the record\n"));
+        printf(_("  -V,  --version        Print the program version\n"));
 }
 
 static long get_uptime(void)
@@ -148,6 +152,10 @@ int main(int argc, char **argv)
                 { NULL, 0, NULL, 0 }
         };
 
+        setlocale(LC_ALL, "");
+        bindtextdomain(PACKAGE, LOCALEDIR);
+        textdomain(PACKAGE);
+
         while ((c = getopt_long(argc, argv, "f:hHVlub", opts, &opt_index)) != -1) {
                 switch (c) {
                         case 'f':
@@ -181,7 +189,6 @@ int main(int argc, char **argv)
                 }
         }
 
-        setlocale(LC_ALL, "");
         payload = create_payload(payload_options);
         if (payload == NULL) {
                 exit(EXIT_FAILURE);
@@ -210,7 +217,7 @@ int main(int argc, char **argv)
                 ret = EXIT_FAILURE;
                 goto done;
         } else {
-                printf("Successfully sent record to daemon.\n");
+                printf(_("Successfully sent record to daemon.\n"));
                 ret = EXIT_SUCCESS;
         }
 done:

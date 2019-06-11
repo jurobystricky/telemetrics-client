@@ -1,4 +1,4 @@
-SUBDIRS = .
+SUBDIRS = po .
 
 ACLOCAL_AMFLAGS = -I build-aux/m4
 

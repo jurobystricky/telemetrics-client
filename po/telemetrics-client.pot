@@ -1,0 +1,272 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# This file is distributed under the same license as the telemetrics-client package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: telemetrics-client 2.2.0\n"
+"Report-Msgid-Bugs-To: https://clearlinux.org/\n"
+"POT-Creation-Date: 2019-08-01 09:23-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/probes/hello.c:41
+#, c-format
+msgid "%s: Usage\n"
+msgstr ""
+
+#: src/probes/hello.c:42
+#, c-format
+msgid ""
+"  -f,  --config_file    Configuration file. This overides the other "
+"parameters\n"
+msgstr ""
+
+#: src/probes/hello.c:43
+#, c-format
+msgid "  -H,  --heartbeat      Create a \"heartbeat\" record instead\n"
+msgstr ""
+
+#: src/probes/hello.c:44
+#, c-format
+msgid "  -h,  --help           Display this help message\n"
+msgstr ""
+
+#: src/probes/hello.c:45
+#, c-format
+msgid "  -l,  --locale         Include locale in the record\n"
+msgstr ""
+
+#: src/probes/hello.c:46
+#, c-format
+msgid "  -u,  --uptime         Include uptime in the record\n"
+msgstr ""
+
+#: src/probes/hello.c:47
+#, c-format
+msgid "  -b,  --bundles        Include installed bundles in the record\n"
+msgstr ""
+
+#: src/probes/hello.c:48
+#, c-format
+msgid "  -V,  --version        Print the program version\n"
+msgstr ""
+
+#: src/probes/hello.c:220
+#, c-format
+msgid "Successfully sent record to daemon.\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:64 src/journal/cli.c:33
+#, c-format
+msgid "Usage:\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:65
+#, c-format
+msgid ""
+"  telem-record-gen [OPTIONS] - create and send a custom telemetry record\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:67
+#, c-format
+msgid "Help Options:\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:68
+#, c-format
+msgid "  -h, --help            Show help options\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:70
+#, c-format
+msgid "Application Options:\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:71
+#, c-format
+msgid "  -V, --version         Print the program version\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:72
+#, c-format
+msgid "  -s, --severity        Severity level (1-4) - (default 1)\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:73
+#, c-format
+msgid ""
+"  -c, --class           Classification level_1/level_2/level_3 (required)\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:74
+#, c-format
+msgid "  -p, --payload         Record body (max size = 8k) (required)\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:75
+#, c-format
+msgid "  -P, --payload-file    File to read payload from\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:76
+#, c-format
+msgid ""
+"  -R, --record-version  Version number for format of payload (default 1)\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:77
+#, c-format
+msgid "  -e, --event-id        Event id to use in the record\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:78
+#, c-format
+msgid "  -o, --echo            Echo record to stdout\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:79
+#, c-format
+msgid "  -n, --no-post         Do not post record just print\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:80
+#, c-format
+msgid ""
+"  -f, --config_file     Specify a configuration file other than default\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:175
+#, c-format
+msgid "Error: Classification required. See --help.\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:182
+#, c-format
+msgid "Error: Valid size for classification is 1-%d chars\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:189
+#, c-format
+msgid "Error: Non-ascii characters detected in classification - aborting\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:201
+#, c-format
+msgid ""
+"Error: Classification strings between slashes should have at most %d chars\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:210
+#, c-format
+msgid ""
+"Error: Classification needs to be in most/to/least specific format, 2 '/' "
+"required.\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:218
+#, c-format
+msgid "Error: Valid range for severity is 1-4\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:226
+#, c-format
+msgid "Error: event_id length %zu it should have %d characters\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:230
+#, c-format
+msgid ""
+"Error: event_id contains invalid character '%c' at position %zu, valid "
+"characters are %s\n"
+msgstr ""
+
+#: src/probes/telem_record_gen.c:248
+#, c-format
+msgid "Error: file %s could not be opened for reading\n"
+msgstr ""
+
+#: src/journal/cli.c:34
+#, c-format
+msgid ""
+"  telem_journal [-Vi] [-r <record_id>] [-e <event_id>] [-c <classification>] "
+"[-b <boot_id>]\n"
+"\n"
+msgstr ""
+
+#: src/journal/cli.c:35
+#, c-format
+msgid "Where:\n"
+msgstr ""
+
+#: src/journal/cli.c:36
+#, c-format
+msgid "  -r,  --record_id        Print record with specific record_id\n"
+msgstr ""
+
+#: src/journal/cli.c:37
+#, c-format
+msgid "  -e,  --event_id         Print records with specific event_id\n"
+msgstr ""
+
+#: src/journal/cli.c:38
+#, c-format
+msgid "  -c,  --classification   Print records with specific classification\n"
+msgstr ""
+
+#: src/journal/cli.c:39
+#, c-format
+msgid "  -b,  --boot_id          Print records with specific boot_id\n"
+msgstr ""
+
+#: src/journal/cli.c:40
+#, c-format
+msgid "  -i,  --include_record   Include record content if available.\n"
+msgstr ""
+
+#: src/journal/cli.c:41
+#, c-format
+msgid ""
+"                          Content only available when telemetry is "
+"configured\n"
+msgstr ""
+
+#: src/journal/cli.c:42
+#, c-format
+msgid "                          with \"record_retention_enabled=true\"\n"
+msgstr ""
+
+#: src/journal/cli.c:43
+#, c-format
+msgid "  -V,  --verbose          Verbose output\n"
+msgstr ""
+
+#: src/journal/cli.c:44
+#, c-format
+msgid "  -h,  --help             Display this help message\n"
+msgstr ""
+
+#: src/journal/cli.c:109
+msgid "Classification"
+msgstr ""
+
+#: src/journal/cli.c:109
+msgid "Time stamp"
+msgstr ""
+
+#: src/journal/cli.c:114
+#, c-format
+msgid "Total records: %d\n"
+msgstr ""
+
+#: src/journal/cli.c:118
+#, c-format
+msgid "Unable to open journal\n"
+msgstr ""

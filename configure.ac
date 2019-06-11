@@ -77,6 +77,21 @@ AC_CHECK_FUNCS([strerror])
 AC_CHECK_FUNCS([strndup])
 AC_CHECK_FUNCS([strtol])
 AC_CHECK_FUNCS([uname])
+AC_CHECK_FUNCS([gettext])
+
+# i18n support.
+# See http://gnu.org/s/gnulib/manual/html_node/gettextize-and-autopoint.html.
+AM_GNU_GETTEXT_VERSION([0.19.8])
+AM_GNU_GETTEXT([external])
+
+# Native language support
+AC_ARG_ENABLE([nls],
+	[AS_HELP_STRING([--enable-nls],
+		[enable native language support @<:@default=no@:>@])],,
+	[enable_nls=no])
+AS_IF([test "x$enable_nls" = "xyes"],
+	[AC_DEFINE([ENABLE_NLS], [1], [Define to 1 to enable i18n.])
+AC_CHECK_FUNCS([bind_textdomain_codeset])])
 
 # Options
 
@@ -145,7 +160,7 @@ case x$logtype in
 esac
 
 AC_CONFIG_COMMANDS([config dir],[mkdir -p src/data; touch src/data/.dirstamp])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile po/Makefile.in])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_OUTPUT
 
@@ -171,4 +186,5 @@ systemconfdir:          $confpath
 socketdir:              $socketpath
 loglevel:               $loglevel
 logtype:                $logtype
+i18n:                   $enable_nls
 ])

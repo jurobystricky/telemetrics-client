@@ -1,0 +1,3 @@
+     ../src/probes/hello.c \
+     ../src/probes/telem_record_gen.c \
+     ../src/journal/cli.c
